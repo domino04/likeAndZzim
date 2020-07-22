@@ -32,4 +32,14 @@ urlpatterns = [
     path('edit/<int:post_pk>', views.edit, name="edit"),
     path('delete/<int:post_pk>', views.delete, name="delete"),
     path('delete_comment/<int:post_pk>/<int:comment_pk>', views.delete_comment, name="delete_comment"),
+    
+    # Like
+    path('like', views.like, name="like"),
+    # Zzim
+    path('zzim', views.zzim, name="zzim"),
+    path('checkLike', views.checkLike, name="checkLike"),
+    path('checkZzim', views.checkZzim, name="checkZzim"),
+    
+    path('likeall/', views.likeall, name="likeall"),
+    path('zzimall/', views.zzimall, name="zzimall")
 ]

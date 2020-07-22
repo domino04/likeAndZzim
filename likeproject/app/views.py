@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
-from .models import Post, Comment
+from .models import Post, Comment, Like, Zzim
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+import json
 
 # Create your views here.
 def home(request):
@@ -97,3 +100,116 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return redirect('home')
+
+def likeall(request):
+    likeposts = Like.objects.filter(user = request.user)
+    return render(request, 'likeall.html', { 'likeposts': likeposts })
+
+def zzimall(request):
+    zzimposts = Zzim.objects.filter(user = request.user)
+    return render(request, 'zzimall.html', { 'zzimposts': zzimposts })
+
+@csrf_exempt
+def like(request):
+    if request.method == "POST":
+        request_body = json.loads(request.body)
+        post_pk = request_body['post_pk']
+        
+        existing_like = Like.objects.filter(
+            post = Post.objects.get(pk=post_pk),
+            user = request.user
+        )
+        #좋아요 취소
+        if existing_like.count() > 0:
+            existing_like.delete()
+        #좋아요 생성
+        else:
+            Like.objects.create(
+                post = Post.objects.get(pk=post_pk),
+                user = request.user
+            )
+
+        post_likes = Like.objects.filter(
+            post = Post.objects.get(pk=post_pk)
+        )
+        
+        # existing_like랑 같은 거 한번 더 만들어주기
+        # existing_like는 지워줬기 때문.
+        likeCheck = Like.objects.filter(
+            post = Post.objects.get(pk=post_pk),
+            user = request.user
+        )
+        response = {
+            'like_count' : post_likes.count(),
+            'likeCheck': likeCheck.count()
+        }
+        return HttpResponse(json.dumps(response))
+    
+    
+@csrf_exempt
+def zzim(request):
+    if request.method == "POST":
+        request_body = json.loads(request.body)
+        post_pk = request_body['post_pk']
+        
+        existing_zzim = Zzim.objects.filter(
+            post = Post.objects.get(pk=post_pk),
+            user = request.user
+        )
+        
+        #좋아요 취소
+        if existing_zzim.count() > 0:
+            existing_zzim.delete()
+        
+        #좋아요 생성
+        else:
+            Zzim.objects.create(
+                post = Post.objects.get(pk=post_pk),
+                user = request.user
+            )
+
+        post_zzims = Zzim.objects.filter(
+            post = Post.objects.get(pk=post_pk)
+        )
+        zzimCheck = Zzim.objects.filter(
+            post = Post.objects.get(pk=post_pk),
+            user = request.user
+        )
+        response = {
+            'zzim_count' : post_zzims.count(),
+            'zzimCheck' : zzimCheck.count()
+        }
+        return HttpResponse(json.dumps(response))
+      
+    
+
+
+@csrf_exempt
+def checkLike(request):
+    if request.method == "POST":
+        request_body = json.loads(request.body)
+        post_pk = request_body['post_pk']
+        existing = Like.objects.filter(
+            post = Post.objects.get(pk=post_pk),
+            user = request.user
+        )
+        response = {
+            'existing': existing.count()
+        }
+        
+        return HttpResponse(json.dumps(response))
+    
+@csrf_exempt
+def checkZzim(request):
+    if request.method == "POST":
+        request_body = json.loads(request.body)
+        post_pk = request_body['post_pk']
+        existing = Zzim.objects.filter(
+            post = Post.objects.get(pk=post_pk),
+            user = request.user
+        )
+        response = {
+            'existing': existing.count()
+        }
+        
+        return HttpResponse(json.dumps(response))

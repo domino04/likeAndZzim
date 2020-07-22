@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for likepost in likeposts %}
+<div>
+  <h1>좋아요 누른 글</h1>
+  <ul>
+    <li>
+      <a href="{% url 'detail' likepost.post.pk %}">{{ likepost.post.title }}</a>
+    </li>
+  </ul>
+</div>
+{% endfor %} {% endblock content %}

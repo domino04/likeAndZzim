@@ -14,3 +14,12 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+
+
+class Like(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="likes")
+    
+class Zzim(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="zzims")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="zzims")
